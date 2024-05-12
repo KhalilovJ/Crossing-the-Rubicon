@@ -1,0 +1,18 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: CrossingTheRubicon
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+      show-sql: true
+  datasource:
+    url: jdbc:postgresql://ep-silent-scene-832464.eu-central-1.aws.neon.tech/TurnBasedBackend?user=${spring.datasource.username}&password=${spring.datasource.password}
+    username:
+    password:
+
