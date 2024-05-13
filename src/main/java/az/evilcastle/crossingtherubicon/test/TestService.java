@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class TestService {
     private final TestRedisRepo testRedisRepo;
 
-    @PostConstruct
+//    @PostConstruct
     private void testRedis(){
         System.out.println(testRedisRepo.save(TestEntity.builder().string("str").build()));
     }
