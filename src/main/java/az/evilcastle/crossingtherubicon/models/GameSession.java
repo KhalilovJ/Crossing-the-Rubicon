@@ -1,4 +1,4 @@
-package az.evilcastle.crossingtherubicon.test.model;
+package az.evilcastle.crossingtherubicon.models;
 
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
@@ -13,9 +13,9 @@ import java.io.Serializable;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Data
-@RedisHash("test_entity")
-public class TestEntity implements Serializable {
+@RedisHash("game_session")
+public class GameSession implements Serializable {
     @Id
     private String id;
-    private String string;
+    private String sessionName;
 }
