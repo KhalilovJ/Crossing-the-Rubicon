@@ -24,11 +24,13 @@ repositories {
 dependencies {
     // Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework:spring-websocket'
 
     // Jackson
     implementation 'com.fasterxml.jackson.core:jackson-databind'
 
-    implementation 'org.springframework:spring-websocket'
+    // Apache
+    implementation 'org.apache.commons:commons-collections4:4.5.0-M1'
 
     // Validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -41,14 +43,25 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    // redis
+    // Mapstruct
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+    // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-
-    // test
+    // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
 }
