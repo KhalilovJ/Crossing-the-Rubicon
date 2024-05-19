@@ -25,12 +25,10 @@ dependencies {
     // Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework:spring-websocket'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
 
     // Jackson
     implementation 'com.fasterxml.jackson.core:jackson-databind'
-
-    // Apache
-    implementation 'org.apache.commons:commons-collections4:4.5.0-M1'
 
     // Validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
