@@ -1,6 +1,6 @@
 package az.evilcastle.crossingtherubicon.service;
 
-import az.evilcastle.crossingtherubicon.dao.repository.GameSessionRedisRepository;
+import az.evilcastle.crossingtherubicon.dao.repository.GameSessionMongoRepository;
 import az.evilcastle.crossingtherubicon.mapper.GameSessionMapper;
 import az.evilcastle.crossingtherubicon.model.dto.GameSessionDto;
 
@@ -16,14 +16,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GameSessionService {
 
-    private final GameSessionRedisRepository gameSessionRedisRepository;
+    private final GameSessionMongoRepository gameSessionMongoRepository;
 
     private final GameSessionMapper gameSessionMapper;
 
     public List<GameSessionDto> getAllGameSessions() {
         log.debug("ActionLog.getAllGameSessions.start");
 
-        var gameSessionEntities = gameSessionRedisRepository.findAll();
+        var gameSessionEntities = gameSessionMongoRepository.findAll();
         var gameSessionsDtoList = IterableUtils.toList(gameSessionEntities).stream()
                 .map(gameSessionMapper::entityToDto)
                 .toList();

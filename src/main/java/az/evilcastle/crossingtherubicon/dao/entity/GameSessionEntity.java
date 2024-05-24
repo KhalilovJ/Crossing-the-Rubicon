@@ -1,11 +1,10 @@
 package az.evilcastle.crossingtherubicon.dao.entity;
 
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
 
@@ -13,7 +12,6 @@ import java.io.Serializable;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Data
-@RedisHash("game_session")
 public class GameSessionEntity implements Serializable {
     @Id
     private String id;
