@@ -31,7 +31,7 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        log.info("WebSocketSession message received; sessionId: {}; Message: {}", session.getId(), message);
+        log.info("WebSocketSession message received; sessionId: {}; Message: {}", session.getId(), message.getPayload());
 
     }
 }
