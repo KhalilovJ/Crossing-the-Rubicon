@@ -29,17 +29,17 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        log.debug("Server connection established; WebSessionId: {}", session.getId());
+        log.info("Server connection established; WebSessionId: {}", session.getId());
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        log.debug("Server connection closed: {}", status);
+        log.info("Server connection closed: {}", status);
     }
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        log.debug("WebSocketSession message received; sessionId: {}; Message: {}", session.getId(), message.getPayload());
+        log.info("WebSocketSession message received; sessionId: {}; Message: {}", session.getId(), message.getPayload());
 
         var requestMessage = objectMapper.readValue(message.getPayload(), WebsocketMessageParent.class);
         requestMessage.setWebsocketId(session.getId());
