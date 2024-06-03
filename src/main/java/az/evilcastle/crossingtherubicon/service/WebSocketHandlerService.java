@@ -1,6 +1,8 @@
 package az.evilcastle.crossingtherubicon.service;
 
+import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WSCreateLobbyMessage;
 import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WebsocketMessageParent;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebSocketHandlerService extends TextWebSocketHandler implements SubProtocolCapable {
     private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
     public List<String> getSubProtocols() {
         return Collections.emptyList();
@@ -26,29 +29,35 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        log.info("Server connection established; WebSessionId: {}", session.getId());
+        log.debug("Server connection established; WebSessionId: {}", session.getId());
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        log.info("Server connection closed: {}", status);
+        log.debug("Server connection closed: {}", status);
     }
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        log.info("WebSocketSession message received; sessionId: {}; Message: {}", session.getId(), message.getPayload());
+        log.debug("WebSocketSession message received; sessionId: {}; Message: {}", session.getId(), message.getPayload());
+
         var requestMessage = objectMapper.readValue(message.getPayload(), WebsocketMessageParent.class);
         requestMessage.setWebsocketId(session.getId());
+
         handleMessage(requestMessage);
     }
 
-    private void handleMessage(WebsocketMessageParent message){
-        switch (message.getRequestType()){
-            case GET_LOBBIES -> {}
-            case CREATE_LOBBY -> log.info(message.toString());
-            case CONNECT_LOBBY -> {}
-            case START_COMMAND -> {}
-            case WEBSOCKET_CALLBACK -> {}
+    private void handleMessage(WebsocketMessageParent message) {
+        switch (message.getRequestType()) {
+            case GET_LOBBIES -> {
+            }
+            case CREATE_LOBBY -> log.info(((WSCreateLobbyMessage) message).toString());
+            case CONNECT_LOBBY -> {
+            }
+            case START_COMMAND -> {
+            }
+            case WEBSOCKET_CALLBACK -> {
+            }
         }
     }
 }
