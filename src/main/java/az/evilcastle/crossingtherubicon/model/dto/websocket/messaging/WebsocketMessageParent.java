@@ -12,11 +12,11 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = WSCreateLobbyMessage.class, name = "WSCreateLobbyMessage")
+        @JsonSubTypes.Type(value = WSCreateLobbyMessage.class, name = "CREATE_LOBBY"),
 })
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "className")
-public abstract class WebsocketMessageParent {
+public class WebsocketMessageParent {
     String websocketId;
     WebsocketMessageType requestType;
 }
