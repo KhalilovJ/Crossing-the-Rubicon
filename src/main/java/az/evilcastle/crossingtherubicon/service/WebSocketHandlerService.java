@@ -1,5 +1,6 @@
 package az.evilcastle.crossingtherubicon.service;
 
+import az.evilcastle.crossingtherubicon.model.constant.WebsocketMessageType;
 import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WSCreateLobbyMessage;
 import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WebsocketMessageParent;
 
@@ -30,6 +31,12 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         log.info("Server connection established; WebSessionId: {}", session.getId());
+
+        var message = WebsocketMessageParent.builder()
+                .websocketId(session.getId())
+                .requestType(WebsocketMessageType.CONNECT_WEBSOCKET)
+                .build();
+        session.sendMessage(new TextMessage(message.toString()));
     }
 
     @Override
