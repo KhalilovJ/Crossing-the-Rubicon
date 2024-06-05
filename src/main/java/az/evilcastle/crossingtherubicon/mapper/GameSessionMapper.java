@@ -1,7 +1,7 @@
 package az.evilcastle.crossingtherubicon.mapper;
 
 import az.evilcastle.crossingtherubicon.dao.entity.GameSessionEntity;
-import az.evilcastle.crossingtherubicon.model.dto.GameSessionDto;
+import az.evilcastle.crossingtherubicon.model.dto.gamesession.GameSessionDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 

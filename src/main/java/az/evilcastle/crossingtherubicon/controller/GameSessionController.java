@@ -1,6 +1,6 @@
 package az.evilcastle.crossingtherubicon.controller;
 
-import az.evilcastle.crossingtherubicon.model.dto.GameSessionDto;
+import az.evilcastle.crossingtherubicon.model.dto.gamesession.GameSessionDto;
 import az.evilcastle.crossingtherubicon.service.GameSessionService;
 
 import lombok.RequiredArgsConstructor;

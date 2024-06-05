@@ -1,6 +1,8 @@
 package az.evilcastle.crossingtherubicon.service;
 
 import az.evilcastle.crossingtherubicon.model.constant.WebsocketMessageType;
+import az.evilcastle.crossingtherubicon.model.dto.PlayerDto;
+import az.evilcastle.crossingtherubicon.model.dto.gamesession.CreateGameSessionDto;
 import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WSCreateLobbyMessage;
 import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WebsocketMessageParent;
 
@@ -21,6 +23,8 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class WebSocketHandlerService extends TextWebSocketHandler implements SubProtocolCapable {
+
+    private final GameSessionService sessionService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -58,8 +62,14 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
         switch (message.getRequestType()) {
             case GET_LOBBIES -> {
             }
-            case CREATE_LOBBY -> log.info(((WSCreateLobbyMessage) message).toString());
+            case CREATE_LOBBY -> {
+                WSCreateLobbyMessage ws = (WSCreateLobbyMessage) message;
+                CreateGameSessionDto dto = new CreateGameSessionDto(ws.getLobbyName(),ws.getPassword());
+                PlayerDto test = new PlayerDto("ihateniggas",message.getWebsocketId());
+                sessionService.createGameSession(dto,test);
+                log.info(((WSCreateLobbyMessage) message).toString());}
             case CONNECT_LOBBY -> {
+                //TODO connect ucun ayri dto?
             }
             case START_COMMAND -> {
             }

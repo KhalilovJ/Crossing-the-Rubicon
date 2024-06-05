@@ -1,15 +1,21 @@
 package az.evilcastle.crossingtherubicon.service;
 
+import az.evilcastle.crossingtherubicon.dao.entity.GameSessionEntity;
 import az.evilcastle.crossingtherubicon.dao.repository.GameSessionMongoRepository;
+import az.evilcastle.crossingtherubicon.exceptions.LobbyIsFullException;
+import az.evilcastle.crossingtherubicon.exceptions.LobbyIsNotFound;
 import az.evilcastle.crossingtherubicon.mapper.GameSessionMapper;
-import az.evilcastle.crossingtherubicon.model.dto.GameSessionDto;
+import az.evilcastle.crossingtherubicon.model.constant.GameStatus;
+import az.evilcastle.crossingtherubicon.model.dto.PlayerDto;
+import az.evilcastle.crossingtherubicon.model.dto.gamesession.CreateGameSessionDto;
+import az.evilcastle.crossingtherubicon.model.dto.gamesession.GameSessionDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.IterableUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 @Log4j2
@@ -30,5 +36,33 @@ public class GameSessionService {
 
         log.debug("ActionLog.getAllGameSessions.end");
         return gameSessionsDtoList;
+    }
+
+
+    public GameSessionDto createGameSession(CreateGameSessionDto sessionDto, PlayerDto player){
+        GameSessionEntity session = GameSessionEntity.builder()
+                .id(UUID.randomUUID().toString())
+                .sessionName(sessionDto.name())
+                .password(sessionDto.password() != null ? sessionDto.password() : null)
+                .status(GameStatus.WAITING)
+                .players(Collections.singletonList(player))
+                .build();
+        log.info("👾Lobby: {} created by {}",session,player.username());
+        return gameSessionMapper.entityToDto(session);
+    }
+
+
+    public GameSessionDto connectGameSession(PlayerDto player, String lobbyName){
+        GameSessionEntity lobby = gameSessionMongoRepository.findBySessionName(lobbyName)
+                .orElseThrow(()->new LobbyIsNotFound("Lobby is not found"));
+        List<PlayerDto> currentPlayers = lobby.getPlayers();
+        currentPlayers.add(player);
+        if (currentPlayers.size()>=2){
+            throw  new LobbyIsFullException("Lobby is full");
+        }
+        else {
+            gameSessionMongoRepository.save(lobby);
+        }
+        return gameSessionMapper.entityToDto(lobby);
     }
 }
