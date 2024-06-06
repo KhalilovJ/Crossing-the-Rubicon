@@ -7,12 +7,14 @@ import az.evilcastle.crossingtherubicon.exceptions.LobbyIsNotFound;
 import az.evilcastle.crossingtherubicon.mapper.GameSessionMapper;
 import az.evilcastle.crossingtherubicon.model.constant.GameStatus;
 import az.evilcastle.crossingtherubicon.model.dto.PlayerDto;
+import az.evilcastle.crossingtherubicon.model.dto.gamesession.ConnectToLobbyDto;
 import az.evilcastle.crossingtherubicon.model.dto.gamesession.CreateGameSessionDto;
 import az.evilcastle.crossingtherubicon.model.dto.gamesession.GameSessionDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.IterableUtils;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -52,17 +54,24 @@ public class GameSessionService {
     }
 
 
-    public GameSessionDto connectGameSession(PlayerDto player, String lobbyName){
-        GameSessionEntity lobby = gameSessionMongoRepository.findBySessionName(lobbyName)
+    public GameSessionDto connectGameSession(PlayerDto player, ConnectToLobbyDto connect){
+        GameSessionEntity lobby = gameSessionMongoRepository.findBySessionName(connect.name())
                 .orElseThrow(()->new LobbyIsNotFound("Lobby is not found"));
-        List<PlayerDto> currentPlayers = lobby.getPlayers();
-        currentPlayers.add(player);
-        if (currentPlayers.size()>=2){
-            throw  new LobbyIsFullException("Lobby is full");
+        if (Objects.equals(connect.password(), lobby.getPassword())){
+            List<PlayerDto> currentPlayers = lobby.getPlayers();
+            currentPlayers.add(player);
+            if (currentPlayers.size()>=2){
+                throw  new LobbyIsFullException("Lobby is full");
+            }
+            else {
+                lobby.setStatus(GameStatus.READY);
+                gameSessionMongoRepository.save(lobby);
+            }
         }
         else {
-            gameSessionMongoRepository.save(lobby);
+            throw new LobbyIsFullException("Password is wrong");
         }
+
         return gameSessionMapper.entityToDto(lobby);
     }
 }

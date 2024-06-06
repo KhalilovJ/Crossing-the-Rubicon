@@ -8,7 +8,8 @@ import lombok.Getter;
 public enum GameStatus {
 
     WAITING(0),
-    STARTED(1);
+    READY(1),
+    STARTED(2);
 
     private int statusCode;
 }

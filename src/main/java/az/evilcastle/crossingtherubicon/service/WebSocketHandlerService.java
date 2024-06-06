@@ -2,7 +2,9 @@ package az.evilcastle.crossingtherubicon.service;
 
 import az.evilcastle.crossingtherubicon.model.constant.WebsocketMessageType;
 import az.evilcastle.crossingtherubicon.model.dto.PlayerDto;
+import az.evilcastle.crossingtherubicon.model.dto.gamesession.ConnectToLobbyDto;
 import az.evilcastle.crossingtherubicon.model.dto.gamesession.CreateGameSessionDto;
+import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WSConnectLobbyMessage;
 import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WSCreateLobbyMessage;
 import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WebsocketMessageParent;
 
@@ -69,7 +71,11 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
                 sessionService.createGameSession(dto,test);
                 log.info(((WSCreateLobbyMessage) message).toString());}
             case CONNECT_LOBBY -> {
-                //TODO connect ucun ayri dto?
+                WSConnectLobbyMessage ws = (WSConnectLobbyMessage) message;
+                ConnectToLobbyDto dto = new ConnectToLobbyDto(ws.getName(), ws.getPassword());
+                PlayerDto test = new PlayerDto("iloveniggas",message.getWebsocketId());
+                sessionService.connectGameSession(test,dto);
+                log.info(((WSConnectLobbyMessage) message).toString());
             }
             case START_COMMAND -> {
             }
