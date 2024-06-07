@@ -50,6 +50,7 @@ public class GameSessionService {
                 .players(Collections.singletonList(player))
                 .build();
         log.info("👾Lobby: {} created by {}",session,player.username());
+        gameSessionMongoRepository.save(session);
         return gameSessionMapper.entityToDto(session);
     }
 
@@ -57,13 +58,14 @@ public class GameSessionService {
     public GameSessionDto connectGameSession(PlayerDto player, ConnectToLobbyDto connect){
         GameSessionEntity lobby = gameSessionMongoRepository.findBySessionName(connect.name())
                 .orElseThrow(()->new LobbyIsNotFound("Lobby is not found"));
+        log.info("{} tried connect to lobby {}",player.username(),lobby.getSessionName());
         if (Objects.equals(connect.password(), lobby.getPassword())){
             List<PlayerDto> currentPlayers = lobby.getPlayers();
-            currentPlayers.add(player);
             if (currentPlayers.size()>=2){
                 throw  new LobbyIsFullException("Lobby is full");
             }
             else {
+                currentPlayers.add(player);
                 lobby.setStatus(GameStatus.READY);
                 gameSessionMongoRepository.save(lobby);
             }
@@ -71,7 +73,7 @@ public class GameSessionService {
         else {
             throw new LobbyIsFullException("Password is wrong");
         }
-
+        log.info(lobby);
         return gameSessionMapper.entityToDto(lobby);
     }
 }

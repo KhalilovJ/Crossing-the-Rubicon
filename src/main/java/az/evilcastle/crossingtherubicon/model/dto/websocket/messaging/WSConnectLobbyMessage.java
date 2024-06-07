@@ -13,7 +13,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class WSConnectLobbyMessage extends WebsocketMessageParent{
 
-    private String name;
+    private String lobbyName;
     private String password;
 
 }
