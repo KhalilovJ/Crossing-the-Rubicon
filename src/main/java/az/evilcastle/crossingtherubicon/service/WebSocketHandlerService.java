@@ -4,6 +4,7 @@ import az.evilcastle.crossingtherubicon.model.constant.WebsocketMessageType;
 import az.evilcastle.crossingtherubicon.model.dto.PlayerDto;
 import az.evilcastle.crossingtherubicon.model.dto.gamesession.ConnectToLobbyDto;
 import az.evilcastle.crossingtherubicon.model.dto.gamesession.CreateGameSessionDto;
+import az.evilcastle.crossingtherubicon.model.dto.gamesession.LobbyDto;
 import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WSCreateLobbyMessage;
 import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WebsocketMessageParent;
 
@@ -63,23 +64,29 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
         switch (message.getRequestType()) {
             case GET_LOBBIES -> {
             }
-            case CREATE_LOBBY -> {
-                WSCreateLobbyMessage ws = (WSCreateLobbyMessage) message;
-                CreateGameSessionDto dto = new CreateGameSessionDto(ws.getLobbyName(),ws.getPassword());
-                PlayerDto test = new PlayerDto("ihateniggas",message.getWebsocketId());
-                sessionService.createGameSession(dto,test);
-                log.info(((WSCreateLobbyMessage) message).toString());}
-            case CONNECT_LOBBY -> {
-                WSCreateLobbyMessage ws = (WSCreateLobbyMessage) message;
-                ConnectToLobbyDto dto = new ConnectToLobbyDto(ws.getLobbyName(), ws.getPassword());
-                PlayerDto test = new PlayerDto("iloveniggas",message.getWebsocketId());
-                sessionService.connectGameSession(test,dto);
-                log.info(((WSCreateLobbyMessage) message).toString());
-            }
+            case CREATE_LOBBY -> {createLobbyCommand(message);}
+            case CONNECT_LOBBY -> {connectToLobbyCommand(message);}
             case START_COMMAND -> {
             }
             case WEBSOCKET_CALLBACK -> {
             }
         }
+    }
+
+
+    private LobbyDto createLobbyCommand(WebsocketMessageParent message){
+        WSCreateLobbyMessage ws = (WSCreateLobbyMessage) message;
+        CreateGameSessionDto lobby = new CreateGameSessionDto(ws.getLobbyName(),ws.getPassword());
+        PlayerDto creator = new PlayerDto("ihateniggas",message.getWebsocketId());
+        log.info(((WSCreateLobbyMessage) message).toString());
+        return sessionService.createLobby(lobby,creator);
+    }
+
+    private LobbyDto connectToLobbyCommand(WebsocketMessageParent message){
+        WSCreateLobbyMessage ws = (WSCreateLobbyMessage) message;
+        ConnectToLobbyDto lobby = new ConnectToLobbyDto(ws.getLobbyName(), ws.getPassword());
+        PlayerDto connector = new PlayerDto("iloveniggas",message.getWebsocketId());
+        log.info(((WSCreateLobbyMessage) message).toString());
+        return sessionService.connectToLobby(lobby,connector);
     }
 }

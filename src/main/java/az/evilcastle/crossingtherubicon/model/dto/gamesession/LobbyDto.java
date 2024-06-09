@@ -6,10 +6,9 @@ import az.evilcastle.crossingtherubicon.model.dto.PlayerDto;
 import lombok.Builder;
 
 import java.util.List;
-import java.util.UUID;
 
 @Builder
-public record GameSessionDto(
+public record LobbyDto(
         String id,
         String name,
         String password,
