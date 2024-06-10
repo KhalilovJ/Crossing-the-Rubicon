@@ -1,5 +1,6 @@
 package az.evilcastle.crossingtherubicon.service;
 
+import az.evilcastle.crossingtherubicon.dao.entity.WebSocketLobbyEntity;
 import az.evilcastle.crossingtherubicon.model.constant.WebsocketMessageType;
 import az.evilcastle.crossingtherubicon.model.dto.PlayerDto;
 import az.evilcastle.crossingtherubicon.model.dto.gamesession.ConnectToLobbyDto;
@@ -20,6 +21,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -27,6 +29,8 @@ import java.util.List;
 public class WebSocketHandlerService extends TextWebSocketHandler implements SubProtocolCapable {
 
     private final GameSessionService sessionService;
+    private final WebSocketLobbyService webSocketLobbyService;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -64,8 +68,14 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
         switch (message.getRequestType()) {
             case GET_LOBBIES -> {
             }
-            case CREATE_LOBBY -> {createLobbyCommand(message);}
-            case CONNECT_LOBBY -> {connectToLobbyCommand(message);}
+            case CREATE_LOBBY -> {
+                LobbyDto lobby = createLobbyCommand(message);
+                pairSocketAndLobby(lobby.id(),lobby.players());
+            }
+            case CONNECT_LOBBY -> {
+                LobbyDto lobby = connectToLobbyCommand(message);
+                pairSocketAndLobby(lobby.id(),lobby.players());
+            }
             case START_COMMAND -> {
             }
             case WEBSOCKET_CALLBACK -> {
@@ -88,5 +98,11 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
         PlayerDto connector = new PlayerDto("iloveniggas",message.getWebsocketId());
         log.info(((WSCreateLobbyMessage) message).toString());
         return sessionService.connectToLobby(lobby,connector);
+    }
+
+
+    private WebSocketLobbyEntity pairSocketAndLobby(String lobbyId,List<PlayerDto> players){
+        List<String> socketIds = players.stream().map(PlayerDto::webSocketId).toList();
+        return webSocketLobbyService.pairWebSocketLobby(lobbyId,socketIds);
     }
 }
