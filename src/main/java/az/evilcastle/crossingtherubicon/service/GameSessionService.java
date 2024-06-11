@@ -54,7 +54,7 @@ public class GameSessionService {
     }
 
     public LobbyDto connectToLobby(ConnectToLobbyDto connect, PlayerDto player) {
-        GameSessionEntity lobby = findLobby(connect.name());
+        GameSessionEntity lobby = findLobby(connect.lobbyId());
         log.info("{} tried connect to lobby {}", player.username(), lobby.getSessionName());
         validateLobbyPassword(connect.password(), lobby);
         addPlayerToLobby(lobby, player);
@@ -63,7 +63,7 @@ public class GameSessionService {
     }
 
     private GameSessionEntity findLobby(String lobbyName) {
-        return gameSessionMongoRepository.findBySessionName(lobbyName)
+        return gameSessionMongoRepository.findById(lobbyName)
                 .orElseThrow(() -> new LobbyIsNotFound("Lobby is not found"));
     }
 

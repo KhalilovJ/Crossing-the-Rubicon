@@ -6,6 +6,7 @@ import az.evilcastle.crossingtherubicon.model.dto.PlayerDto;
 import az.evilcastle.crossingtherubicon.model.dto.gamesession.ConnectToLobbyDto;
 import az.evilcastle.crossingtherubicon.model.dto.gamesession.CreateGameSessionDto;
 import az.evilcastle.crossingtherubicon.model.dto.gamesession.LobbyDto;
+import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WSConnectLobbyMessage;
 import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WSCreateLobbyMessage;
 import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WebsocketMessageParent;
 
@@ -93,10 +94,10 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
     }
 
     private LobbyDto connectToLobbyCommand(WebsocketMessageParent message){
-        WSCreateLobbyMessage ws = (WSCreateLobbyMessage) message;
-        ConnectToLobbyDto lobby = new ConnectToLobbyDto(ws.getLobbyName(), ws.getPassword());
+        WSConnectLobbyMessage ws = (WSConnectLobbyMessage) message;
+        ConnectToLobbyDto lobby = new ConnectToLobbyDto(ws.getLobbyId(), ws.getPassword());
         PlayerDto connector = new PlayerDto("iloveniggas",message.getWebsocketId());
-        log.info(((WSCreateLobbyMessage) message).toString());
+        log.info(((WSConnectLobbyMessage) message).toString());
         return sessionService.connectToLobby(lobby,connector);
     }
 
