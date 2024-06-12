@@ -1,7 +1,7 @@
 package az.evilcastle.crossingtherubicon.mapper;
 
 import az.evilcastle.crossingtherubicon.dao.entity.GameSessionEntity;
-import az.evilcastle.crossingtherubicon.model.dto.GameSessionDto;
+import az.evilcastle.crossingtherubicon.model.dto.gamesession.LobbyDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
@@ -11,7 +11,7 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GameSessionMapper {
 
-    GameSessionDto entityToDto(GameSessionEntity entity);
+    LobbyDto entityToDto(GameSessionEntity entity);
 
-    GameSessionEntity dtoToEntity(GameSessionDto dto);
+    GameSessionEntity dtoToEntity(LobbyDto dto);
 }
