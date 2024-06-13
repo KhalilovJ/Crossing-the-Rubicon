@@ -1,15 +1,7 @@
 package az.evilcastle.crossingtherubicon.service;
-
-import az.evilcastle.crossingtherubicon.dao.entity.WebSocketLobbyEntity;
 import az.evilcastle.crossingtherubicon.model.constant.WebsocketMessageType;
-import az.evilcastle.crossingtherubicon.model.dto.PlayerDto;
-import az.evilcastle.crossingtherubicon.model.dto.gamesession.ConnectToLobbyDto;
-import az.evilcastle.crossingtherubicon.model.dto.gamesession.CreateGameSessionDto;
 import az.evilcastle.crossingtherubicon.model.dto.gamesession.LobbyDto;
-import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WSConnectLobbyMessage;
-import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WSCreateLobbyMessage;
 import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WebsocketMessageParent;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,10 +11,9 @@ import org.springframework.web.socket.SubProtocolCapable;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Component
 @Slf4j
@@ -70,12 +61,12 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
             case GET_LOBBIES -> {
             }
             case CREATE_LOBBY -> {
-                LobbyDto lobby = createLobbyCommand(message);
-                pairSocketAndLobby(lobby.id(),lobby.players());
+                LobbyDto lobby = sessionService.createLobbyCommand(message);
+                webSocketLobbyService.pairSocketAndLobby(lobby.id(),lobby.players().get(0));
             }
             case CONNECT_LOBBY -> {
-                LobbyDto lobby = connectToLobbyCommand(message);
-                pairSocketAndLobby(lobby.id(),lobby.players());
+                LobbyDto lobby = sessionService.connectToLobbyCommand(message);
+                webSocketLobbyService.pairSocketAndLobby(lobby.id(),lobby.players().get(1));
             }
             case START_COMMAND -> {
             }
@@ -84,26 +75,4 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
         }
     }
 
-
-    private LobbyDto createLobbyCommand(WebsocketMessageParent message){
-        WSCreateLobbyMessage ws = (WSCreateLobbyMessage) message;
-        CreateGameSessionDto lobby = new CreateGameSessionDto(ws.getLobbyName(),ws.getPassword());
-        PlayerDto creator = new PlayerDto("ihateniggas",message.getWebsocketId());
-        log.info(((WSCreateLobbyMessage) message).toString());
-        return sessionService.createLobby(lobby,creator);
-    }
-
-    private LobbyDto connectToLobbyCommand(WebsocketMessageParent message){
-        WSConnectLobbyMessage ws = (WSConnectLobbyMessage) message;
-        ConnectToLobbyDto lobby = new ConnectToLobbyDto(ws.getLobbyId(), ws.getPassword());
-        PlayerDto connector = new PlayerDto("iloveniggas",message.getWebsocketId());
-        log.info(((WSConnectLobbyMessage) message).toString());
-        return sessionService.connectToLobby(lobby,connector);
-    }
-
-
-    private WebSocketLobbyEntity pairSocketAndLobby(String lobbyId,List<PlayerDto> players){
-        List<String> socketIds = players.stream().map(PlayerDto::webSocketId).toList();
-        return webSocketLobbyService.pairWebSocketLobby(lobbyId,socketIds);
-    }
 }

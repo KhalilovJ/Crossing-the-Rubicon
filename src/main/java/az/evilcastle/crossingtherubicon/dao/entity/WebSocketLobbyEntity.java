@@ -16,6 +16,8 @@ import java.util.List;
 public class WebSocketLobbyEntity implements Serializable {
 
     @Id
+    private String id;
     private String lobbyId;
-    private List<String> socketIds;
+    private String socketId;
+
 }

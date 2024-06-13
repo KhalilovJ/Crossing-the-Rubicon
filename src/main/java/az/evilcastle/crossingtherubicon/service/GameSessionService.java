@@ -11,6 +11,9 @@ import az.evilcastle.crossingtherubicon.model.dto.gamesession.ConnectToLobbyDto;
 import az.evilcastle.crossingtherubicon.model.dto.gamesession.CreateGameSessionDto;
 import az.evilcastle.crossingtherubicon.model.dto.gamesession.LobbyDto;
 
+import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WSConnectLobbyMessage;
+import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WSCreateLobbyMessage;
+import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WebsocketMessageParent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.IterableUtils;
@@ -81,5 +84,22 @@ public class GameSessionService {
         currentPlayers.add(player);
         lobby.setStatus(GameStatus.READY);
         gameSessionMongoRepository.save(lobby);
+    }
+
+
+    public LobbyDto createLobbyCommand(WebsocketMessageParent message){
+        WSCreateLobbyMessage ws = (WSCreateLobbyMessage) message;
+        CreateGameSessionDto lobby = new CreateGameSessionDto(ws.getLobbyName(),ws.getPassword());
+        PlayerDto creator = new PlayerDto("ihateniggas",message.getWebsocketId());
+        log.info(((WSCreateLobbyMessage) message).toString());
+        return createLobby(lobby,creator);
+    }
+
+    public LobbyDto connectToLobbyCommand(WebsocketMessageParent message){
+        WSConnectLobbyMessage ws = (WSConnectLobbyMessage) message;
+        ConnectToLobbyDto lobby = new ConnectToLobbyDto(ws.getLobbyId(), ws.getPassword());
+        PlayerDto connector = new PlayerDto("iloveniggas",message.getWebsocketId());
+        log.info(((WSConnectLobbyMessage) message).toString());
+        return connectToLobby(lobby,connector);
     }
 }
