@@ -29,6 +29,7 @@ public class GameSessionService {
     private final GameSessionMongoRepository gameSessionMongoRepository;
 
     private final GameSessionMapper gameSessionMapper;
+    private final WebSocketLobbyService webSocketLobbyService;
 
     public List<LobbyDto> getAllGameSessions() {
         log.debug("ActionLog.getAllGameSessions.start");
@@ -53,6 +54,7 @@ public class GameSessionService {
                 .build();
         log.info("👾Lobby: {} created by {}",lobby,player.username());
         gameSessionMongoRepository.save(lobby);
+        webSocketLobbyService.pairSocketAndLobby(lobby.getId(),lobby.getPlayers().get(0));
         return gameSessionMapper.entityToDto(lobby);
     }
 
@@ -62,6 +64,7 @@ public class GameSessionService {
         validateLobbyPassword(connect.password(), lobby);
         addPlayerToLobby(lobby, player);
         log.info("{} successfully connected to lobby {}",player.username(),lobby.getSessionName());
+        webSocketLobbyService.pairSocketAndLobby(lobby.getId(),lobby.getPlayers().get(1));
         return gameSessionMapper.entityToDto(lobby);
     }
 

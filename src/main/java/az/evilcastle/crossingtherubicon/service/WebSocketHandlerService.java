@@ -61,12 +61,10 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
             case GET_LOBBIES -> {
             }
             case CREATE_LOBBY -> {
-                LobbyDto lobby = sessionService.createLobbyCommand(message);
-                webSocketLobbyService.pairSocketAndLobby(lobby.id(),lobby.players().get(0));
+                sessionService.createLobbyCommand(message);
             }
             case CONNECT_LOBBY -> {
-                LobbyDto lobby = sessionService.connectToLobbyCommand(message);
-                webSocketLobbyService.pairSocketAndLobby(lobby.id(),lobby.players().get(1));
+                sessionService.connectToLobbyCommand(message);
             }
             case START_COMMAND -> {
             }
