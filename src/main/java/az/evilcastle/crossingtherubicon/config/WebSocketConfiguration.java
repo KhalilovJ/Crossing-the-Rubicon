@@ -2,6 +2,7 @@ package az.evilcastle.crossingtherubicon.config;
 
 import az.evilcastle.crossingtherubicon.service.GameSessionService;
 import az.evilcastle.crossingtherubicon.service.WebSocketHandlerService;
+import az.evilcastle.crossingtherubicon.service.WebSocketLobbyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +17,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 public class WebSocketConfiguration implements WebSocketConfigurer {
 
     private final GameSessionService sessionService;
+    private final WebSocketLobbyService webSocketLobbyService;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
@@ -24,6 +26,6 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
 
     @Bean
     public WebSocketHandler webSocketHandler() {
-        return new WebSocketHandlerService(sessionService);
+        return new WebSocketHandlerService(sessionService,webSocketLobbyService);
     }
 }

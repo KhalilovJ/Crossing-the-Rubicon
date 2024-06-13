@@ -11,6 +11,9 @@ import az.evilcastle.crossingtherubicon.model.dto.gamesession.ConnectToLobbyDto;
 import az.evilcastle.crossingtherubicon.model.dto.gamesession.CreateGameSessionDto;
 import az.evilcastle.crossingtherubicon.model.dto.gamesession.LobbyDto;
 
+import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WSConnectLobbyMessage;
+import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WSCreateLobbyMessage;
+import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WebsocketMessageParent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.IterableUtils;
@@ -26,6 +29,7 @@ public class GameSessionService {
     private final GameSessionMongoRepository gameSessionMongoRepository;
 
     private final GameSessionMapper gameSessionMapper;
+    private final WebSocketLobbyService webSocketLobbyService;
 
     public List<LobbyDto> getAllGameSessions() {
         log.debug("ActionLog.getAllGameSessions.start");
@@ -50,20 +54,22 @@ public class GameSessionService {
                 .build();
         log.info("👾Lobby: {} created by {}",lobby,player.username());
         gameSessionMongoRepository.save(lobby);
+        webSocketLobbyService.pairSocketAndLobby(lobby.getId(),lobby.getPlayers().get(0));
         return gameSessionMapper.entityToDto(lobby);
     }
 
     public LobbyDto connectToLobby(ConnectToLobbyDto connect, PlayerDto player) {
-        GameSessionEntity lobby = findLobby(connect.name());
+        GameSessionEntity lobby = findLobby(connect.lobbyId());
         log.info("{} tried connect to lobby {}", player.username(), lobby.getSessionName());
         validateLobbyPassword(connect.password(), lobby);
         addPlayerToLobby(lobby, player);
         log.info("{} successfully connected to lobby {}",player.username(),lobby.getSessionName());
+        webSocketLobbyService.pairSocketAndLobby(lobby.getId(),lobby.getPlayers().get(1));
         return gameSessionMapper.entityToDto(lobby);
     }
 
     private GameSessionEntity findLobby(String lobbyName) {
-        return gameSessionMongoRepository.findBySessionName(lobbyName)
+        return gameSessionMongoRepository.findById(lobbyName)
                 .orElseThrow(() -> new LobbyIsNotFound("Lobby is not found"));
     }
 
@@ -81,5 +87,22 @@ public class GameSessionService {
         currentPlayers.add(player);
         lobby.setStatus(GameStatus.READY);
         gameSessionMongoRepository.save(lobby);
+    }
+
+
+    public LobbyDto createLobbyCommand(WebsocketMessageParent message){
+        WSCreateLobbyMessage ws = (WSCreateLobbyMessage) message;
+        CreateGameSessionDto lobby = new CreateGameSessionDto(ws.getLobbyName(),ws.getPassword());
+        PlayerDto creator = new PlayerDto("ihateniggas",message.getWebsocketId());
+        log.info(((WSCreateLobbyMessage) message).toString());
+        return createLobby(lobby,creator);
+    }
+
+    public LobbyDto connectToLobbyCommand(WebsocketMessageParent message){
+        WSConnectLobbyMessage ws = (WSConnectLobbyMessage) message;
+        ConnectToLobbyDto lobby = new ConnectToLobbyDto(ws.getLobbyId(), ws.getPassword());
+        PlayerDto connector = new PlayerDto("iloveniggas",message.getWebsocketId());
+        log.info(((WSConnectLobbyMessage) message).toString());
+        return connectToLobby(lobby,connector);
     }
 }

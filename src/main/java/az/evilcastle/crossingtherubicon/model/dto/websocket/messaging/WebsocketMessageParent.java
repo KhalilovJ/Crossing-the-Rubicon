@@ -15,6 +15,7 @@ import lombok.experimental.SuperBuilder;
 @JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = WSCreateLobbyMessage.class, name = "CREATE_LOBBY"),
+        @JsonSubTypes.Type(value = WSConnectLobbyMessage.class, name = "CONNECT_LOBBY")
 })
 public class WebsocketMessageParent {
     String websocketId;
