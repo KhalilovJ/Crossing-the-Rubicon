@@ -26,6 +26,6 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
 
     @Bean
     public WebSocketHandler webSocketHandler() {
-        return new WebSocketHandlerService(sessionService,webSocketLobbyService);
+        return new WebSocketHandlerService(sessionService);
     }
 }
