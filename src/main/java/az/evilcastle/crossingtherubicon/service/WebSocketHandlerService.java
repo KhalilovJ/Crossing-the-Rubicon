@@ -2,7 +2,9 @@ package az.evilcastle.crossingtherubicon.service;
 
 import az.evilcastle.crossingtherubicon.model.constant.WebsocketMessageType;
 import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WebsocketMessageParent;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -25,6 +27,11 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
     private final GameSessionService sessionService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @PostConstruct
+    private void init(){
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
 
     @Override
     public List<String> getSubProtocols() {
