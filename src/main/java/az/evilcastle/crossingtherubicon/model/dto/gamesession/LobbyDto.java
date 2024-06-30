@@ -10,8 +10,8 @@ import java.util.List;
 @Builder
 public record LobbyDto(
         String id,
-        String name,
-        String password,
+        String lobbyName,
+        boolean hasPassword,
         List<PlayerDto> players,
         GameStatus gameStatus
 

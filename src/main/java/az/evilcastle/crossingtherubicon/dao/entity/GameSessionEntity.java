@@ -18,7 +18,7 @@ import java.util.List;
 public class GameSessionEntity implements Serializable {
     @Id
     private String id;
-    private String sessionName;
+    private String lobbyName;
     private String password;
     private List<PlayerDto> players;
     private GameStatus status;

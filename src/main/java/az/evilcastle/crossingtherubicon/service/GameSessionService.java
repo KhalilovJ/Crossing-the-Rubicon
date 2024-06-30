@@ -11,9 +11,7 @@ import az.evilcastle.crossingtherubicon.model.dto.gamesession.ConnectToLobbyDto;
 import az.evilcastle.crossingtherubicon.model.dto.gamesession.CreateGameSessionDto;
 import az.evilcastle.crossingtherubicon.model.dto.gamesession.LobbyDto;
 
-import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WSConnectLobbyMessage;
-import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WSCreateLobbyMessage;
-import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WebsocketMessageParent;
+import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.IterableUtils;
@@ -47,7 +45,7 @@ public class GameSessionService {
     public LobbyDto createLobby(CreateGameSessionDto sessionDto, PlayerDto player){
         GameSessionEntity lobby = GameSessionEntity.builder()
                 .id(UUID.randomUUID().toString())
-                .sessionName(sessionDto.name())
+                .lobbyName(sessionDto.name())
                 .password(sessionDto.password() != null ? sessionDto.password() : null)
                 .status(GameStatus.WAITING)
                 .players(Collections.singletonList(player))
@@ -60,10 +58,10 @@ public class GameSessionService {
 
     public LobbyDto connectToLobby(ConnectToLobbyDto connect, PlayerDto player) {
         GameSessionEntity lobby = findLobby(connect.lobbyId());
-        log.info("{} tried connect to lobby {}", player.username(), lobby.getSessionName());
+        log.info("{} tried connect to lobby {}", player.username(), lobby.getLobbyName());
         validateLobbyPassword(connect.password(), lobby);
         addPlayerToLobby(lobby, player);
-        log.info("{} successfully connected to lobby {}",player.username(),lobby.getSessionName());
+        log.info("{} successfully connected to lobby {}",player.username(),lobby.getLobbyName());
         webSocketLobbyService.pairSocketAndLobby(lobby.getId(),lobby.getPlayers().get(1));
         return gameSessionMapper.entityToDto(lobby);
     }
