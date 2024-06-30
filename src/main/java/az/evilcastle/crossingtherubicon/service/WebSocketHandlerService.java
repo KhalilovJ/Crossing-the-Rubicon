@@ -61,13 +61,11 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
         var requestMessage = objectMapper.readValue(message.getPayload(), WebsocketMessageParent.class);
         requestMessage.setWebsocketId(session.getId());
 
-        handleMessage(requestMessage);
+        handleMessage(requestMessage, session);
     }
 
-    private void handleMessage(WebsocketMessageParent message) {
+    private void handleMessage(WebsocketMessageParent message, WebSocketSession session) {
         switch (message.getRequestType()) {
-            case GET_LOBBIES -> {
-            }
             case CREATE_LOBBY -> sessionService.createLobbyCommand(message);
             case CONNECT_LOBBY -> sessionService.connectToLobbyCommand(message);
             case START_COMMAND -> {
