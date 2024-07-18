@@ -12,12 +12,13 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WSCreateLobbyMessage extends WebsocketMessageParent{
-    private String lobbyName;
-    private String password;
+public class WSStartSessionMessage extends WebsocketMessageParent {
+
+    private String lobbyId;
+    private boolean start;
 
     @Override
     public WebsocketMessageType getRequestType(){
-        return WebsocketMessageType.CREATE_LOBBY;
+        return WebsocketMessageType.START_COMMAND;
     }
 }
