@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface GameSessionMongoRepository extends MongoRepository<GameSessionEntity, String> {
 
-    Optional<GameSessionEntity> findBySessionName(String sessionName);
+    Optional<GameSessionEntity> findByLobbyName(String sessionName);
 }
