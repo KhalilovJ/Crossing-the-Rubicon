@@ -110,7 +110,6 @@ public class GameSessionService {
     }
 
     public LobbyDto startCommandPressed(WebsocketMessageParent startMessage) {
-        // todo check if both of players started
         var message = (WSStartSessionMessage) startMessage;
         return webSocketLobbyService.findByWebsocketId(message.getWebsocketId())
                 .map(client -> {
@@ -122,7 +121,19 @@ public class GameSessionService {
                                     return playerDto.withStarted(message.isStart());
                                 return playerDto;
                             }).toList());
+
+                    if (checkEveryoneStarted(lobby.getPlayers())) {
+                        lobby.setStatus(GameStatus.STARTED);
+                    }
                     return GameSessionMapper.INSTANCE.entityToDto(gameSessionMongoRepository.save(lobby));
                 }).orElseThrow(() -> new LobbyIsNotFound("Lobby of player " + message.getWebsocketId() + " is not found"));
+    }
+
+    private boolean checkEveryoneStarted(List<PlayerDto> players) {
+        return players.stream()
+                .map(PlayerDto::started)
+                .filter(Boolean::booleanValue)
+                .findFirst()
+                .orElse(false);
     }
 }
