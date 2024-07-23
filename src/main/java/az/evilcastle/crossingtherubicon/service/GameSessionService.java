@@ -19,10 +19,8 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.IterableUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -120,20 +118,20 @@ public class GameSessionService {
                                 if (playerDto.webSocketId().equals(message.getWebsocketId()))
                                     return playerDto.withStarted(message.isStart());
                                 return playerDto;
-                            }).toList());
+                            }).collect(Collectors.toList()));
 
                     if (checkEveryoneStarted(lobby.getPlayers())) {
                         lobby.setStatus(GameStatus.STARTED);
+                        Collections.shuffle(lobby.getPlayers());
                     }
                     return GameSessionMapper.INSTANCE.entityToDto(gameSessionMongoRepository.save(lobby));
                 }).orElseThrow(() -> new LobbyIsNotFound("Lobby of player " + message.getWebsocketId() + " is not found"));
     }
 
     private boolean checkEveryoneStarted(List<PlayerDto> players) {
-        return players.stream()
+        return !players.stream()
                 .map(PlayerDto::started)
-                .filter(Boolean::booleanValue)
-                .findFirst()
-                .orElse(false);
+                .toList()
+                .contains(false);
     }
 }
