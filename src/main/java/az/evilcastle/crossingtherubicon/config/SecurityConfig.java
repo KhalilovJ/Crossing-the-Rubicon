@@ -34,7 +34,8 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/webjars/**",
             "/swagger-ui.html",
-            "/v1/game-sessions/**"};
+            "/v1/game-sessions/**",
+            "/rubicon/**"};
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {

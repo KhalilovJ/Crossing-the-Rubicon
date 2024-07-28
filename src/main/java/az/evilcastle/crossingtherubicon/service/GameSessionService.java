@@ -105,4 +105,8 @@ public class GameSessionService {
         log.info(((WSConnectLobbyMessage) message).toString());
         return connectToLobby(lobby,connector);
     }
+
+    public String returnError(){
+        return "SOMETHING WENT WRONG";
+    }
 }
