@@ -5,8 +5,10 @@ import az.evilcastle.crossingtherubicon.model.constant.WebsocketMessageType;
 import az.evilcastle.crossingtherubicon.model.dto.gamesession.LobbyDto;
 import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WebsocketMessageParent;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -18,6 +20,10 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
 import java.util.*;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 
 @Component
@@ -60,14 +66,39 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
     }
 
     @Override
-    public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        log.info("WebSocketSession message received; sessionId: {}; Message: {}", session.getId(), message.getPayload());
+    public void handleTextMessage(@NonNull WebSocketSession session,
+                                  @NonNull TextMessage message) throws Exception {
+        try {
+            log.info("WebSocketSession message received; sessionId: {}; Message: {}", session.getId(), message.getPayload());
 
-        var requestMessage = objectMapper.readValue(message.getPayload(), WebsocketMessageParent.class);
-        requestMessage.setWebsocketId(session.getId());
+            var requestMessage = objectMapper.readValue(message.getPayload(), WebsocketMessageParent.class);
+            requestMessage.setWebsocketId(session.getId());
 
-        handleMessage(requestMessage, session);
+            handleMessage(requestMessage, session);
+        } catch (JsonProcessingException e) {
+            log.error("Invalid JSON format: {}", message.getPayload(), e);
+            session.sendMessage(new TextMessage("Invalid JSON format: " + e.getOriginalMessage()));
+        } catch (Exception e) {
+            log.error("Error handling message: {}", message.getPayload(), e);
+            handleError(session, e);
+        }
     }
+
+
+    private void handleError(WebSocketSession session, Exception e) {
+        try {
+            session.sendMessage(new TextMessage("Error processing your request: " + e.getMessage()));
+        } catch (IOException ioException) {
+            log.error("Error sending error message to client", ioException);
+        } finally {
+            try {
+                session.close(CloseStatus.SERVER_ERROR);
+            } catch (IOException ioException) {
+                log.error("Error closing session", ioException);
+            }
+        }
+    }
+
 
     private void handleMessage(WebsocketMessageParent message, WebSocketSession session) {
         switch (message.getRequestType()) {

@@ -134,4 +134,8 @@ public class GameSessionService {
                 .toList()
                 .contains(false);
     }
+
+    public String returnError(){
+        return "SOMETHING WENT WRONG";
+    }
 }
