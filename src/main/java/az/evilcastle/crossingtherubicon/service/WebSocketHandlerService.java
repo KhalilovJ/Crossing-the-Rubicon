@@ -67,7 +67,13 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
     private void handleMessage(WebsocketMessageParent message, WebSocketSession session) {
         switch (message.getRequestType()) {
             case CREATE_LOBBY -> sessionService.createLobbyCommand(message);
-            case CONNECT_LOBBY -> sessionService.connectToLobbyCommand(message);
+            case CONNECT_LOBBY ->{
+                try{
+                    sessionService.connectToLobbyCommand(message);
+                } catch (Exception e){
+                    sessionService.returnError();
+                }
+            }
             case START_COMMAND -> {
             }
             case WEBSOCKET_CALLBACK -> {
