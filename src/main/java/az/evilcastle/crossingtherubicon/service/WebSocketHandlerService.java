@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -25,13 +27,18 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
 
     private final GameSessionService sessionService;
     private final WebSocketLobbyService webSocketLobbyService;
-
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @PostConstruct
+    private void init(){
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
 
     @Override
     public List<String> getSubProtocols() {
         return Collections.emptyList();
     }
+
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -41,7 +48,7 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
                 .websocketId(session.getId())
                 .requestType(WebsocketMessageType.CONNECT_WEBSOCKET)
                 .build();
-        session.sendMessage(new TextMessage(message.toString()));
+        sendMessage(session,message);
     }
 
     @Override
@@ -102,6 +109,14 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
             }
             case WEBSOCKET_CALLBACK -> {
             }
+        }
+    }
+
+    public void sendMessage(WebSocketSession session, WebsocketMessageParent message) {
+        try {
+            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(message)));
+        } catch (IOException e) {
+            log.error(e.getMessage());
         }
     }
 
