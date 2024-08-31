@@ -14,6 +14,5 @@ public record LobbyDto(
         boolean hasPassword,
         List<PlayerDto> players,
         GameStatus gameStatus
-
 ) {
 }

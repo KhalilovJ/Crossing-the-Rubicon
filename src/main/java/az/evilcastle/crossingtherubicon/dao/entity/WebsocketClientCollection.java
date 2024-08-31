@@ -7,13 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
-import java.util.List;
 
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Data
-public class WebSocketLobbyEntity implements Serializable {
+public class WebsocketClientCollection implements Serializable {
 
     @Id
     private String id;
