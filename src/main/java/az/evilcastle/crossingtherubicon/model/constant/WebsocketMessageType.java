@@ -7,4 +7,7 @@ public enum WebsocketMessageType {
     CREATE_LOBBY,
     JOIN_COMMAND,
     START_COMMAND,
+    ERROR,
+    GAME_ACTION,
+    END_GAME
 }

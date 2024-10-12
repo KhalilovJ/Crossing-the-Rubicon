@@ -35,6 +35,7 @@ public class SecurityConfig {
             "/webjars/**",
             "/swagger-ui.html",
             "/v1/game-sessions/**",
+            "/test/**",
             "/rubicon/**"};
 
     @Bean

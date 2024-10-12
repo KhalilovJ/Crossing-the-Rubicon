@@ -16,7 +16,10 @@ import lombok.experimental.SuperBuilder;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = WSCreateLobbyMessage.class, name = "CREATE_LOBBY"),
         @JsonSubTypes.Type(value = WSConnectLobbyMessage.class, name = "CONNECT_LOBBY"),
-        @JsonSubTypes.Type(value = WSStartSessionMessage.class, name = "START_COMMAND")
+        @JsonSubTypes.Type(value = WSStartSessionMessage.class, name = "START_COMMAND"),
+        @JsonSubTypes.Type(value = WSErrorMessage.class, name = "ERROR"),
+        @JsonSubTypes.Type(value = WSActionMessage.class, name = "GAME_ACTION"),
+        @JsonSubTypes.Type(value = WSEndGameMessage.class, name = "END_GAME")
 })
 public class WebsocketMessageParent {
     String websocketId;

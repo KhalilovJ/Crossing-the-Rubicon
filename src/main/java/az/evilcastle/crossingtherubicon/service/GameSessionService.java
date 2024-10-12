@@ -74,6 +74,12 @@ public class GameSessionService {
                 .orElseThrow(() -> new LobbyIsNotFound("Lobby is not found"));
     }
 
+    public GameSessionEntity findPlayersLobby (String websocketId){
+        return webSocketLobbyService.findByWebsocketId(websocketId)
+                .flatMap(websocketClientCollection -> gameSessionMongoRepository.findById(websocketClientCollection.getLobbyId()))
+                .orElseThrow(() -> new LobbyIsNotFound("Lobby of " + websocketId + " not found"));
+    }
+
     private void validateLobbyPassword(String providedPassword, GameSessionEntity lobby) {
         if (!Objects.equals(providedPassword, lobby.getPassword())) {
             throw new LobbyIsFullException("Password is wrong");

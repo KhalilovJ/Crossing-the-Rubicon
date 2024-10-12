@@ -3,11 +3,14 @@ package az.evilcastle.crossingtherubicon.service;
 import az.evilcastle.crossingtherubicon.mapper.GameSessionMapper;
 import az.evilcastle.crossingtherubicon.model.constant.WebsocketMessageType;
 import az.evilcastle.crossingtherubicon.model.dto.gamesession.LobbyDto;
+import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WSActionMessage;
+import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WSEndGameMessage;
 import az.evilcastle.crossingtherubicon.model.dto.websocket.messaging.WebsocketMessageParent;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,17 +24,15 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.io.IOException;
 import java.util.*;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
+@Data
 public class WebSocketHandlerService extends TextWebSocketHandler implements SubProtocolCapable {
 
     private final GameSessionService sessionService;
+    private final GameService gameService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -106,6 +107,8 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
                     sendMessage(session, GameSessionMapper.INSTANCE.dtoToLobbyMessage(sessionService.createLobbyCommand(message)));
             case CONNECT_LOBBY -> connectLobbyEvent(message);
             case START_COMMAND -> sendLobby(sessionService.startCommandPressed(message));
+            case GAME_ACTION -> distributeAction((WSActionMessage) message);
+            case END_GAME -> distributeEndGame((WSEndGameMessage) message);
         }
     }
 
@@ -114,9 +117,26 @@ public class WebSocketHandlerService extends TextWebSocketHandler implements Sub
     }
 
     private void sendLobby(LobbyDto lobbyDto) {
-        lobbyDto.players().forEach(playerDto ->
-                Optional.ofNullable(sessionMap.get(playerDto.webSocketId()))
-                        .ifPresent(webSocketSession -> sendMessage(webSocketSession, GameSessionMapper.INSTANCE.dtoToLobbyMessage(lobbyDto))));
+        lobbyDto.players()
+                .forEach(playerDto ->
+                        Optional.ofNullable(sessionMap.get(playerDto.webSocketId()))
+                                .ifPresent(webSocketSession -> sendMessage(webSocketSession, GameSessionMapper.INSTANCE.dtoToLobbyMessage(lobbyDto))));
+    }
+
+    private void distributeAction(WSActionMessage message) {
+        var actionResult = gameService.actionReceived(message);
+        actionResult.getFirst().players()
+                .forEach(playerDto ->
+                        Optional.ofNullable(sessionMap.get(playerDto.webSocketId()))
+                                .ifPresent(webSocketSession -> sendMessage(webSocketSession, message)));
+    }
+
+    private void distributeEndGame(WSEndGameMessage endGameMessage){
+        var actionResult = gameService.actionReceived(endGameMessage);
+        actionResult.getFirst().players()
+                .forEach(playerDto ->
+                        Optional.ofNullable(sessionMap.get(playerDto.webSocketId()))
+                                .ifPresent(webSocketSession -> sendMessage(webSocketSession, endGameMessage)));
     }
 
     public void sendMessage(WebSocketSession session, WebsocketMessageParent message) {
