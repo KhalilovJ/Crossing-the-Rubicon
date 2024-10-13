@@ -14,7 +14,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class WSEndGameMessage extends WebsocketMessageParent {
 
-    private String unitId;
+    private String triggerUnitId;
 
     @Override
     public WebsocketMessageType getRequestType() {
